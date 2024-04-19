@@ -52,6 +52,10 @@ public class BaseService<ENTITY, ID extends Serializable, REPO extends BaseRepos
 		if (id == null) {
 			throw new IllegalArgumentException("ID cannot be null");
 		}
+		if (!repo.existsById(id)) {
+			throw new EntityNotFoundException("not found");
+		}
+		
 		repo.deleteById(id);
 	}
 
