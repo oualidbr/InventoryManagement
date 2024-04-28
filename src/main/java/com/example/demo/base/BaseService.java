@@ -6,7 +6,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import jakarta.persistence.EntityNotFoundException;
+import com.example.demo.exception.NotFoundException;
+
 import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
@@ -27,7 +28,7 @@ public class BaseService<ENTITY, ID extends Serializable, REPO extends BaseRepos
 		if (id == null) {
 			throw new IllegalArgumentException("ID cannot be null");
 		}
-		ENTITY entity = repo.findById(id).orElseThrow(() -> new EntityNotFoundException("not found"));
+		ENTITY entity = repo.findById(id).orElseThrow(() -> new NotFoundException("not found"));
 		return map.mapToDto(entity);
 	}
 
@@ -53,9 +54,9 @@ public class BaseService<ENTITY, ID extends Serializable, REPO extends BaseRepos
 			throw new IllegalArgumentException("ID cannot be null");
 		}
 		if (!repo.existsById(id)) {
-			throw new EntityNotFoundException("not found");
+			throw new NotFoundException("not found");
 		}
-		
+
 		repo.deleteById(id);
 	}
 

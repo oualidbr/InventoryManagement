@@ -1,11 +1,13 @@
 package com.example.demo.model;
 
+import java.util.Set;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +27,7 @@ public class Supplier {
 	private String lastName;
 	private String mobile;
 	private String email;
-	@OneToOne(cascade = CascadeType.ALL)
-	private Address address;
+	@OneToMany(cascade = CascadeType.ALL)
+	private Set<Address> addresses;
 
 }

@@ -14,13 +14,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import jakarta.persistence.EntityNotFoundException;
+import com.example.demo.exception.NotFoundException;
+
+import jakarta.validation.Valid;
 
 @Component
-public abstract class BaseController<DTO, ID extends Serializable, SERVICE extends BaseService<?, ID, ?, DTO, ?>>{
+public abstract class BaseController<DTO, ID extends Serializable, SERVICE extends BaseService<?, ID, ?, DTO, ?>> {
 
 	@Autowired
-		private SERVICE service;
+	private SERVICE service;
 
 	@GetMapping("/all")
 	public ResponseEntity<List<DTO>> findAll() {
@@ -32,12 +34,13 @@ public abstract class BaseController<DTO, ID extends Serializable, SERVICE exten
 		}
 	}
 
-	@GetMapping("/{id}")
+	@GetMapping("/findById/{id}")
 	public ResponseEntity<DTO> findById(@PathVariable ID id) {
 		try {
 			DTO dto = service.findById(id);
+
 			return ResponseEntity.ok(dto);
-		} catch (EntityNotFoundException e) {
+		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -47,39 +50,29 @@ public abstract class BaseController<DTO, ID extends Serializable, SERVICE exten
 	}
 
 	@PostMapping
-	public ResponseEntity<Void> save(@RequestBody DTO dto) {
-		try {
-			service.save(dto);
-			return ResponseEntity.status(HttpStatus.CREATED).build();
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-		}
+	public ResponseEntity<DTO> create(@RequestBody @Valid DTO dto) {
+		service.save(dto);
+		return ResponseEntity.status(HttpStatus.CREATED).body(dto);
 	}
 
 	@PutMapping
-	public ResponseEntity<DTO> update(@RequestBody DTO dto) {
+	public ResponseEntity<DTO> update(@RequestBody @Valid DTO dto) {
 		try {
 			DTO updatedDto = service.update(dto);
 			return ResponseEntity.ok(updatedDto);
-		} catch (EntityNotFoundException e) {
+		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-		} catch (IllegalArgumentException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
 		}
 	}
 
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<String> delete(@PathVariable ID id) {
 		try {
 			service.delete(id);
 			return ResponseEntity.ok("Entity with ID: " + id + " deleted successfully");
 		} catch (IllegalArgumentException e) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-		} catch (EntityNotFoundException e) {
+		} catch (NotFoundException e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
