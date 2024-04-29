@@ -19,6 +19,7 @@ public class BaseService<ENTITY, ID extends Serializable, REPO extends BaseRepos
 	@Autowired
 	private MAP map;
 
+
 	public List<DTO> findAll() {
 		List<ENTITY> entities = repo.findAll();
 		return entities.stream().map(map::mapToDto).collect(Collectors.toList());
@@ -34,6 +35,7 @@ public class BaseService<ENTITY, ID extends Serializable, REPO extends BaseRepos
 
 	public void save(DTO dto) {
 		if (dto == null) {
+			
 			throw new IllegalArgumentException(" this class cannot be null");
 		}
 		ENTITY entity = map.mapToEntity(dto);
